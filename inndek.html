@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Absensi Siswa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #loginForm {
+            margin: 50px auto;
+            padding: 20px;
+            width: 300px;
+            background: white;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+        #loginForm input, #namaSiswa {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginForm">
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+    </div>
+    
+    <div id="absensiSection" style="display:none;">
+        <h2>Absensi Siswa</h2>
+        <input type="text" id="namaSiswa" placeholder="Masukkan Nama Siswa">
+        <button onclick="tambahAbsensi()">Tambah</button>
+        <table>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Waktu</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="absensiBody">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", muatAbsensi);
+
+        function login() {
+            let username = document.getElementById("username").value;
+            let password = document.getElementById("password").value;
+            
+            if (username === "admin" && password === "123") {
+                document.getElementById("loginForm").style.display = "none";
+                document.getElementById("absensiSection").style.display = "block";
+            } else {
+                alert("Username atau password salah!");
+            }
+        }
+
+        function tambahAbsensi() {
+            let nama = document.getElementById("namaSiswa").value;
+            if (nama.trim() === "") {
+                alert("Nama tidak boleh kosong!");
+                return;
+            }
+            
+            let waktu = new Date().toLocaleString();
+            let absensi = JSON.parse(localStorage.getItem("absensi")) || [];
+            absensi.push({ nama, waktu });
+            localStorage.setItem("absensi", JSON.stringify(absensi));
+            document.getElementById("namaSiswa").value = "";
+            muatAbsensi();
+        }
+
+        function muatAbsensi() {
+            let absensi = JSON.parse(localStorage.getItem("absensi")) || [];
+            let tbody = document.getElementById("absensiBody");
+            tbody.innerHTML = "";
+            absensi.forEach((item, index) => {
+                let row = `<tr>
+                    <td>${index + 1}</td>
+                    <td>${item.nama}</td>
+                    <td>${item.waktu}</td>
+                    <td><button onclick="hapusAbsensi(${index})">Hapus</button></td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function hapusAbsensi(index) {
+            let absensi = JSON.parse(localStorage.getItem("absensi")) || [];
+            absensi.splice(index, 1);
+            localStorage.setItem("absensi", JSON.stringify(absensi));
+            muatAbsensi();
+        }
+    </script>
+</body>
+</html>
